@@ -21,16 +21,17 @@ static Params params;
 
 void MyAudioCallback(void *userdata, Uint8* stream, int len)
 {
-	float (*fStream) = (float*) stream;
+	float (*fStream)[2] = (float**) stream;
 
-	for (int i = 0; i < len/(sizeof(float)); ++i)
+	for (int i = 0; i < len/(sizeof(float) * 2); ++i)
 	{
 		PlayTime += DT;
 
 		params.freq += DT*100.0f;
 
-		fStream[i] = sin(PlayTime * 2.0f * PI * params.freq);
-
+		float snd = sin(PlayTime * 2.0f * PI * params.freq);
+		fStream[i][0] = cos(PlayTime) * snd;
+		fStream[i][1] = sin(PlayTime) * snd;
 		// FM Example :
 		//sin(PlayTime * 2.0f * PI * params.freq + 0.33*sin(PlayTime * 1.0f * PI * params.freq));
 	}
@@ -44,7 +45,7 @@ void init_audio()
 	SDL_zero(want);
 	want.freq = FREC;
 	want.format = AUDIO_F32;
-	want.channels = 1;
+	want.channels = 2;
 	want.samples = 4096;
 	want.callback = MyAudioCallback;
 
