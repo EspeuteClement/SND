@@ -27,13 +27,34 @@ void MyAudioCallback(void *userdata, Uint8* stream, int len)
 	{
 		PlayTime += DT;
 
-		params.freq += DT*100.0f;
+		//params.freq += DT*100.0f;
 
-		float snd = sin(PlayTime * 2.0f * PI * params.freq);
+		float snd = sin(PlayTime * 2.0f * PI * params.freq + 1.0f*sin(PlayTime * 3.0f * PI * params.freq));
 		fStream[i][0] = cos(PlayTime) * snd;
 		fStream[i][1] = sin(PlayTime) * snd;
+
+		if (PlayTime > 4)
+		{
+			PlayTime = fmod(PlayTime, 4.0);
+		}
+		if (PlayTime > 3)
+		{
+			params.freq = 880;
+		}
+		else if (PlayTime > 2)
+		{
+			params.freq = 220;
+		}
+		else if (PlayTime > 1)
+		{
+			params.freq = 440;
+		}
+		else
+		{
+			params.freq = 440;
+		}
 		// FM Example :
-		//sin(PlayTime * 2.0f * PI * params.freq + 0.33*sin(PlayTime * 1.0f * PI * params.freq));
+		//
 	}
 }
 
