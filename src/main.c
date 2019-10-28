@@ -8,9 +8,7 @@
 
 #include <SDL.h>
 
-#define FREC 48000
-#define DT (1.0/48000.0)
-#define PI 3.14159265
+
 
 static double PlayTime = 0.0f;
 
@@ -31,7 +29,7 @@ void MyAudioCallback(void *userdata, Uint8* stream, int len)
 
 		//params.freq += DT*100.0f;
 
-		float snd = sin(PlayTime * 2.0f * PI * params.freq + 1.0f*sin(PlayTime * 3.0f * PI * params.freq));
+		float snd = 0.5*sin(PlayTime * 2.0f * PI * params.freq + 1.0f*sin(PlayTime * 3.0f * PI * params.freq));
 		fStream[i][0] = cos(PlayTime) * snd;
 		fStream[i][1] = sin(PlayTime) * snd;
 
