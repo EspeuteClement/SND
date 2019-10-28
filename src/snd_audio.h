@@ -29,7 +29,7 @@ typedef struct snd_song
 {
 	int BPM;
 
-	uint8_t notes[16];
+	uint8_t notes[32];
 
 } snd_song;
 

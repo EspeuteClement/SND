@@ -1,14 +1,16 @@
 #define SDL_DISABLE_IMMINTRIN_H
+#define SDL_MAIN_HANDLED
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-#include <snd_audio.h>
+#include "snd_audio.h"
 
 #include <SDL.h>
 
-
+snd_context ctxt;
 
 static double PlayTime = 0.0f;
 
@@ -21,41 +23,7 @@ static Params params;
 
 void MyAudioCallback(void *userdata, Uint8* stream, int len)
 {
-	float (*fStream)[2] = (float**) stream;
-
-	for (int i = 0; i < len/(sizeof(float) * 2); ++i)
-	{
-		PlayTime += DT;
-
-		//params.freq += DT*100.0f;
-
-		float snd = 0.5*sin(PlayTime * 2.0f * PI * params.freq + 1.0f*sin(PlayTime * 3.0f * PI * params.freq));
-		fStream[i][0] = cos(PlayTime) * snd;
-		fStream[i][1] = sin(PlayTime) * snd;
-
-		if (PlayTime > 4)
-		{
-			PlayTime = fmod(PlayTime, 4.0);
-		}
-		if (PlayTime > 3)
-		{
-			params.freq = 880;
-		}
-		else if (PlayTime > 2)
-		{
-			params.freq = 220;
-		}
-		else if (PlayTime > 1)
-		{
-			params.freq = 440;
-		}
-		else
-		{
-			params.freq = 440;
-		}
-		// FM Example :
-		//
-	}
+	snd_generate_frames(&ctxt, stream, len);
 }
 
 void init_audio()
@@ -95,17 +63,16 @@ int main(int argc, char** argv)
 
     {
         SDL_Window* pWindow = NULL;
-        pWindow = SDL_CreateWindow("Ma première application SDL2",SDL_WINDOWPOS_UNDEFINED,
+        pWindow = SDL_CreateWindow("SND",SDL_WINDOWPOS_UNDEFINED,
                                                                   SDL_WINDOWPOS_UNDEFINED,
                                                                   640,
                                                                   480,
                                                                   SDL_WINDOW_SHOWN);
 
-        // Init audio thread
-        init_audio();
-
-        snd_context ctxt;
         snd_init(&ctxt);
+
+		// Init audio thread
+		init_audio();
 
         if( pWindow )
         {

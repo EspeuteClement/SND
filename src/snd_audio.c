@@ -3,12 +3,14 @@
 #include <math.h>
 #include <string.h>
 
-#define TICKS_PER_BPM 1440
+#define TICKS_PER_BPM (1440.0*6.0)
 #define _TWELTH_ROOT_OF_TWO 1.059463094359
 
 void snd_compute_tick_length(snd_context* ctxt)
 {
 	ctxt->tick_lenght = ctxt->song.BPM / TICKS_PER_BPM;
+
+	SND_LOG("tick_lenght : %20.18d", ctxt->tick_lenght);
 }
 
 void snd_note_to_english(uint8_t note, char* out)
@@ -66,19 +68,35 @@ void snd_init_pitch_table(snd_context* ctxt)
 
 void snd_init(snd_context* ctxt)
 {
-	snd_init_pitch_table(ctxt);
-	snd_compute_tick_length(ctxt);
-
 	memset(ctxt, 0, sizeof(snd_context));
 
-	ctxt->current_note = SND_NOTE_OFF;
+	ctxt->song.BPM = 140;
+
+	// Debug LICK
+
+	for (int _i = 0; _i < 32; ++_i)
+	{
+		ctxt->song.notes[_i] = 127;
+	}
+	ctxt->song.notes[0] = 53;
+	ctxt->song.notes[2] = 55;
+	ctxt->song.notes[4] = 56;
+	ctxt->song.notes[6] = 58;
+	ctxt->song.notes[8] = 55;
+	ctxt->song.notes[12] = 51;
+	ctxt->song.notes[14] = 53;
+
+	ctxt->current_note = ctxt->song.notes[0];
+
+	snd_init_pitch_table(ctxt);
+	snd_compute_tick_length(ctxt);
 }
 
 void snd_generate_frames(snd_context* ctxt, void* out_buffer, int nb_bytes)
 {
 	float (*_stream)[2] = (float**) out_buffer;
 
-	for (int _i = 0; _i < nb_bytes * 2 * sizeof(float); ++_i)
+	for (int _i = 0; _i < nb_bytes / 2 / sizeof(float); ++_i)
 	{
 		float _sample = 0;
 		int _current_note = ctxt->current_note;
@@ -86,7 +104,7 @@ void snd_generate_frames(snd_context* ctxt, void* out_buffer, int nb_bytes)
 		if (ctxt->current_note != SND_NOTE_OFF)
 		{
 			double _freq = 2.0 * PI * ctxt->pitch_data[_current_note].pitch;
-			_sample = 0.5*sin(ctxt->generator_phase * _freq);
+			_sample = 0.10*sin(ctxt->generator_phase * _freq + 0.25*sin(ctxt->generator_phase * _freq *0.5) + 0.25 * sin(ctxt->generator_phase * _freq * 2));
 
 			ctxt->generator_phase += SND_FRAME_TIME;
 		}
@@ -96,7 +114,7 @@ void snd_generate_frames(snd_context* ctxt, void* out_buffer, int nb_bytes)
 
 		ctxt->song_frame_pointer += SND_FRAME_TIME;
 
-		while (ctxt->song_frame_pointer >  ctxt->tick_lenght)
+		while (ctxt->song_frame_pointer > ctxt->tick_lenght)
 		{
 			ctxt->song_current_tick ++;
 			ctxt->song_frame_pointer -= ctxt->tick_lenght;
@@ -104,10 +122,22 @@ void snd_generate_frames(snd_context* ctxt, void* out_buffer, int nb_bytes)
 			if (ctxt->song_current_tick > SND_TICK_PER_NOTE)
 			{
 				ctxt->song_current_tick %= SND_TICK_PER_NOTE;
-				ctxt->song_current_note = (ctxt->song_current_note + 1) % 16;
+				ctxt->song_current_note = (ctxt->song_current_note + 1) % 32;
 
-				ctxt->current_note = ctxt->song.notes[ctxt->song_current_note];
-				ctxt->generator_phase = 0;
+				int _next_note = ctxt->song.notes[ctxt->song_current_note];
+				if (_next_note != SND_NOTE_OFF)
+				{
+					ctxt->current_note = _next_note;
+					ctxt->generator_phase = 0;
+
+#if SND_DEBUG
+					char notename[4];
+					snd_note_to_english(ctxt->current_note, notename);
+					SND_LOG("Playing note %d (%s)\n", ctxt->current_note, notename);
+#endif
+				}
+
+
 			}
 		}
 	}
