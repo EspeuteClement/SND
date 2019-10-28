@@ -1,1 +1,5 @@
 out/*
+x64/*
+.vs/*
+*.filters
+*.user
