@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <snd_audio.h>
+
 #include <SDL.h>
 
 #define FREC 48000
@@ -103,6 +105,9 @@ int main(int argc, char** argv)
 
         // Init audio thread
         init_audio();
+
+        snd_context ctxt;
+        snd_init(&ctxt);
 
         if( pWindow )
         {
