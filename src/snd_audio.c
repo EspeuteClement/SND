@@ -70,7 +70,7 @@ void snd_init(snd_context* ctxt)
 {
 	memset(ctxt, 0, sizeof(snd_context));
 
-	ctxt->song.BPM = 140;
+	ctxt->song.BPM = 80;
 
 	// Debug LICK
 

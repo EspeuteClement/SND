@@ -19,6 +19,8 @@ void snd_gui_init(snd_gui_context* ctxt)
 
 void snd_gui_render(snd_gui_context* ctxt)
 {
+	memset(&ctxt->tilemap, 0, sizeof(ctxt->tilemap));
+
 	draw_string(ctxt, 0, 0, "Hello World!");
 
 	{
@@ -40,7 +42,7 @@ void snd_gui_render(snd_gui_context* ctxt)
 
 		if (ctxt->audio_context.song_current_note < 16)
 		{
-			draw_string(ctxt, 0, ctxt->audio_context.song_current_note, ">");
+			draw_string(ctxt, 0, ctxt->audio_context.song_current_note+1, ">");
 		}
 	}
 
