@@ -111,6 +111,10 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)lib\sdl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>xcopy /y /d  "$(ProjectDir)lib\sdl\lib\*.dll" "$(OutDir)"
+xcopy /y /d /s "$(ProjectDir)res" "$(OutDir)res" /i</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
@@ -120,13 +124,19 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)lib\sdl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>xcopy /y /d  "$(ProjectDir)lib\sdl\lib\*.dll" "$(OutDir)"
+xcopy /y /d /s "$(ProjectDir)res" "$(OutDir)res" /i</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\snd_audio.c" />
+    <ClCompile Include="src\snd_gui.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\snd_audio.h" />
+    <ClInclude Include="src\snd_gui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
